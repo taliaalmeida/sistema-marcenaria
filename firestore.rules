@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /orcamentos/{id} {
+      // Demonstração: leitura pública, criação validada, sem edição/exclusão
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(
+          ['cliente', 'projeto', 'itens', 'custoTotal', 'fator', 'valorFinal', 'criadoEm'])
+        && request.resource.data.cliente is string
+        && request.resource.data.cliente.size() <= 80
+        && request.resource.data.projeto is string
+        && request.resource.data.projeto.size() <= 80
+        && request.resource.data.itens is list
+        && request.resource.data.itens.size() >= 1
+        && request.resource.data.itens.size() <= 50
+        && request.resource.data.custoTotal is number
+        && request.resource.data.fator is number
+        && request.resource.data.fator >= 1
+        && request.resource.data.valorFinal is number;
+      allow update, delete: if false;
+    }
+  }
+}

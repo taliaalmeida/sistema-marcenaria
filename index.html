@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Orçamentos - Marcenaria</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+  <!-- Cabeçalho -->
+  <header class="bg-amber-900 text-white shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <h1 class="text-xl font-bold tracking-wide">🪚 Gestão & Orçamentos — Marcenaria</h1>
+        <p class="text-xs text-amber-200">Sistema Demonstrativo integrado ao Firebase Firestore</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="status-firebase" class="text-xs bg-amber-800 px-3 py-1.5 rounded-full border border-amber-700">
+          ⏳ Conectando ao Firebase...
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Coluna 1 e 2: Montagem do Orçamento -->
+    <section class="lg:col-span-2 space-y-6">
+      
+      <!-- Dados do Cliente / Projeto -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-lg font-semibold mb-4 text-slate-700">1. Dados do Projeto</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Nome do Cliente</label>
+            <input type="text" id="cliente-nome" placeholder="Ex: João Silva" 
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-700" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Ambiente / Móvel</label>
+            <input type="text" id="projeto-nome" placeholder="Ex: Cozinha Planejada" 
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-700" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Fator Multiplicador (Mão de Obra/Lucro)</label>
+            <input type="number" id="fator-lucro" value="2.2" step="0.1" min="1"
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-700" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Seleção de Materiais (Base Flaviense) -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-lg font-semibold mb-1 text-slate-700">2. Adicionar Materiais e Ferragens</h2>
+        <p class="text-xs text-slate-400 mb-4">Preços de referência para demonstração. Variam por região, fornecedor e data.</p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Item do Catálogo</label>
+            <select id="select-material" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:border-amber-700">
+              <!-- Preenchido via JS -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Quantidade</label>
+            <input type="number" id="input-qtd" value="1" min="1" 
+              class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-700" />
+          </div>
+          <div>
+            <button id="btn-adicionar" 
+              class="w-full bg-amber-800 hover:bg-amber-900 text-white font-medium text-sm py-2 px-4 rounded-lg transition cursor-pointer">
+              + Adicionar
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela de Itens Adicionados -->
+        <div class="mt-6 overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-slate-200 text-slate-500 text-xs uppercase">
+                <th class="py-2">Material / Ferragem</th>
+                <th class="py-2 text-center">Qtd</th>
+                <th class="py-2 text-right">Unitário</th>
+                <th class="py-2 text-right">Subtotal</th>
+                <th class="py-2 text-center">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-itens" class="divide-y divide-slate-100">
+              <tr>
+                <td colspan="5" class="py-6 text-center text-slate-400 text-xs">
+                  Nenhum material adicionado ao orçamento ainda.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Coluna 3: Resumo Financeiro e Histórico Firestore -->
+    <aside class="space-y-6">
+      
+      <!-- Card Resumo -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-lg font-semibold mb-4 text-slate-700">Resumo do Orçamento</h2>
+        <div class="space-y-2 text-sm border-b border-slate-200 pb-4">
+          <div class="flex justify-between text-slate-600">
+            <span>Custo de Materiais:</span>
+            <span id="total-custo" class="font-medium">R$ 0,00</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Mão de Obra / Margem:</span>
+            <span id="total-margem" class="font-medium text-emerald-700">R$ 0,00</span>
+          </div>
+        </div>
+        <div class="flex justify-between items-center pt-4 mb-6">
+          <span class="font-bold text-slate-800">Valor Final ao Cliente:</span>
+          <span id="total-final" class="text-2xl font-bold text-amber-900">R$ 0,00</span>
+        </div>
+
+        <button id="btn-salvar" 
+          class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2.5 px-4 rounded-lg transition shadow-sm cursor-pointer">
+          💾 Salvar Orçamento no Firebase
+        </button>
+      </div>
+
+      <!-- Orçamentos Salvos no Firestore -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-sm font-semibold text-slate-700">Orçamentos Salvos (Nuvem)</h3>
+          <button id="btn-atualizar" class="text-xs text-amber-800 hover:underline cursor-pointer">Atualizar</button>
+        </div>
+        <ul id="lista-orcamentos" class="space-y-2 text-xs">
+          <li class="text-slate-400">Carregando registros...</li>
+        </ul>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- Script Firebase e Lógica do Sistema -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // Configuração do seu projeto Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmGmgOON_9dQsvfKotrrXRAYd30FzEvPc",
+      authDomain: "sistema-marcenaria-rwn.firebaseapp.com",
+      databaseURL: "https://sistema-marcenaria-rwn-default-rtdb.firebaseio.com",
+      projectId: "sistema-marcenaria-rwn",
+      storageBucket: "sistema-marcenaria-rwn.firebasestorage.app",
+      messagingSenderId: "312420384374",
+      appId: "1:312420384374:web:faba436c4b47bca2da6957"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Catálogo de Materiais (preços de referência — atualize antes de uso real)
+    const catalogoMateriais = [
+      { id: 1, nome: "Chapa MDF Branco TX 15mm (2,75x1,85m)", preco: 265.00 },
+      { id: 2, nome: "Chapa MDF Branco TX 18mm (2,75x1,85m)", preco: 310.00 },
+      { id: 3, nome: "Chapa MDF Branco TX 6mm Fundo (2,75x1,85m)", preco: 145.00 },
+      { id: 4, nome: "Fita de Borda Branco TX 22mm x 50m", preco: 31.85 },
+      { id: 5, nome: "Fita de Borda Branco TX 29mm x 50m", preco: 26.65 },
+      { id: 6, nome: "Fita de Borda Branco TX 40mm x 50m", preco: 41.32 },
+      { id: 7, nome: "Cola de Contato Formica Alta Resistência 2,8kg", preco: 176.43 },
+      { id: 8, nome: "Cola PVA Branca Cascorez Extra 500g", preco: 22.80 },
+      { id: 9, nome: "Cola PVA Branca Cascorez Extra 1kg", preco: 44.47 },
+      { id: 10, nome: "Parafuso Chipboard 4,0x16mm (Cx c/ 1.000)", preco: 24.92 },
+      { id: 11, nome: "Parafuso Chipboard 4,0x40mm (Cx c/ 500)", preco: 12.46 },
+      { id: 12, nome: "Parafuso Chipboard 4,5x50mm (Cx c/ 300)", preco: 21.37 },
+      { id: 13, nome: "Cantoneira Fixação Reta 3 Furos (Unidade)", preco: 0.83 },
+      { id: 14, nome: "Cantoneira Reforçada L 3x3cm (Unidade)", preco: 3.72 },
+      { id: 15, nome: "Tapa Furo CPL 13mm Branco (Kit c/ 100)", preco: 7.48 },
+      { id: 16, nome: "Corrediça Telescópica Reforçada FGVTN H45 (Par)", preco: 8.71 },
+      { id: 17, nome: "Corrediça Telescópica com Amortecedor (Par)", preco: 22.03 },
+      { id: 18, nome: "Dobradiça Reta Slide On Sem Mola (Unidade)", preco: 2.78 },
+      { id: 19, nome: "Dobradiça Curva Slide On Sem Mola (Unidade)", preco: 2.80 },
+      { id: 20, nome: "Dobradiça Slide On com Amortecedor (Unidade)", preco: 3.99 },
+      { id: 21, nome: "Pistão a Gás Normal 80N/100N (Unidade)", preco: 4.72 },
+      { id: 22, nome: "Pistão a Gás com Amortecedor (Unidade)", preco: 9.41 },
+      { id: 23, nome: "Perfil Puxador Alumínio Cava Bendito 15mm (3m)", preco: 60.02 },
+      { id: 24, nome: "Perfil Puxador Alumínio Fosco PGM005 15mm (3m)", preco: 77.88 },
+      { id: 25, nome: "Puxador Ponto Redondo Inox/Preto (Unidade)", preco: 2.06 },
+      { id: 26, nome: "Puxador Alça Hastvel Light (Unidade)", preco: 4.19 }
+    ];
+
+    let itensOrcamento = [];
+
+    // Elementos DOM
+    const selectMaterial = document.getElementById("select-material");
+    const inputQtd = document.getElementById("input-qtd");
+    const btnAdicionar = document.getElementById("btn-adicionar");
+    const tabelaItens = document.getElementById("tabela-itens");
+    const fatorLucroInput = document.getElementById("fator-lucro");
+    const totalCustoEl = document.getElementById("total-custo");
+    const totalMargemEl = document.getElementById("total-margem");
+    const totalFinalEl = document.getElementById("total-final");
+    const btnSalvar = document.getElementById("btn-salvar");
+    const listaOrcamentosEl = document.getElementById("lista-orcamentos");
+    const statusFirebaseEl = document.getElementById("status-firebase");
+
+    const formatarMoeda = (valor) => valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    // Escapa texto vindo do banco antes de inserir no HTML (evita XSS)
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+
+    // Fator multiplicador nunca abaixo de 1 (evita margem negativa)
+    const lerFator = () => Math.max(1, parseFloat(fatorLucroInput.value) || 1);
+
+    // Popular Select
+    catalogoMateriais.forEach((mat) => {
+      const option = document.createElement("option");
+      option.value = mat.id;
+      option.textContent = `${mat.nome} — ${formatarMoeda(mat.preco)}`;
+      selectMaterial.appendChild(option);
+    });
+
+    // Renderizar Tabela e Totais
+    function atualizarTela() {
+      if (itensOrcamento.length === 0) {
+        tabelaItens.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">Nenhum material adicionado ao orçamento ainda.</td></tr>`;
+      } else {
+        tabelaItens.innerHTML = itensOrcamento.map((item, index) => `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2.5 pr-2 font-medium text-slate-700">${item.nome}</td>
+            <td class="py-2.5 text-center">${item.qtd}</td>
+            <td class="py-2.5 text-right text-slate-500">${formatarMoeda(item.preco)}</td>
+            <td class="py-2.5 text-right font-semibold">${formatarMoeda(item.preco * item.qtd)}</td>
+            <td class="py-2.5 text-center">
+              <button onclick="removerItem(${index})" class="text-red-500 hover:text-red-700 text-xs font-bold cursor-pointer">✕</button>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      const custoTotal = itensOrcamento.reduce((acc, item) => acc + (item.preco * item.qtd), 0);
+      const fator = lerFator();
+      const valorFinal = custoTotal * fator;
+      const margem = valorFinal - custoTotal;
+
+      totalCustoEl.textContent = formatarMoeda(custoTotal);
+      totalMargemEl.textContent = formatarMoeda(margem);
+      totalFinalEl.textContent = formatarMoeda(valorFinal);
+    }
+
+    // Adicionar Item
+    btnAdicionar.addEventListener("click", () => {
+      const idSelecionado = parseInt(selectMaterial.value);
+      const qtd = parseInt(inputQtd.value) || 1;
+      const material = catalogoMateriais.find(m => m.id === idSelecionado);
+
+      if (material && qtd > 0) {
+        const existente = itensOrcamento.find(i => i.id === material.id);
+        if (existente) {
+          existente.qtd += qtd;
+        } else {
+          itensOrcamento.push({ ...material, qtd });
+        }
+        inputQtd.value = 1;
+        atualizarTela();
+      }
+    });
+
+    window.removerItem = (index) => {
+      itensOrcamento.splice(index, 1);
+      atualizarTela();
+    };
+
+    fatorLucroInput.addEventListener("input", atualizarTela);
+    fatorLucroInput.addEventListener("blur", () => {
+      fatorLucroInput.value = lerFator();
+      atualizarTela();
+    });
+
+    // Salvar no Firestore
+    btnSalvar.addEventListener("click", async () => {
+      const cliente = document.getElementById("cliente-nome").value.trim() || "Cliente Demonstração";
+      const projeto = document.getElementById("projeto-nome").value.trim() || "Móvel Planejado";
+
+      if (itensOrcamento.length === 0) {
+        alert("Adicione pelo menos um material antes de salvar.");
+        return;
+      }
+
+      btnSalvar.disabled = true;
+      btnSalvar.textContent = "Salvando...";
+
+      const custoTotal = itensOrcamento.reduce((acc, i) => acc + (i.preco * i.qtd), 0);
+      const fator = lerFator();
+
+      try {
+        await addDoc(collection(db, "orcamentos"), {
+          cliente,
+          projeto,
+          itens: itensOrcamento,
+          custoTotal,
+          fator,
+          valorFinal: custoTotal * fator,
+          criadoEm: serverTimestamp()
+        });
+        alert("Orçamento salvo com sucesso no Firebase!");
+        itensOrcamento = [];
+        document.getElementById("cliente-nome").value = "";
+        document.getElementById("projeto-nome").value = "";
+        atualizarTela();
+        carregarOrcamentos();
+      } catch (error) {
+        console.error("Erro ao salvar:", error);
+        alert("Erro ao salvar no Firestore. Verifique as regras do banco e sua conexão.");
+      } finally {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = "💾 Salvar Orçamento no Firebase";
+      }
+    });
+
+    // Carregar Orçamentos do Firestore
+    async function carregarOrcamentos() {
+      try {
+        const q = query(collection(db, "orcamentos"), orderBy("criadoEm", "desc"));
+        const snapshot = await getDocs(q);
+        statusFirebaseEl.textContent = "🟢 Conectado ao Firebase";
+        statusFirebaseEl.classList.replace("bg-amber-800", "bg-emerald-700");
+
+        if (snapshot.empty) {
+          listaOrcamentosEl.innerHTML = `<li class="text-slate-400">Nenhum orçamento salvo ainda.</li>`;
+          return;
+        }
+
+        listaOrcamentosEl.innerHTML = "";
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const dataCriacao = data.criadoEm?.toDate
+            ? data.criadoEm.toDate().toLocaleDateString("pt-BR")
+            : "";
+          const li = document.createElement("li");
+          li.className = "p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center";
+          li.innerHTML = `
+            <div>
+              <p class="font-semibold text-slate-800">${esc(data.cliente)}</p>
+              <p class="text-slate-500">${esc(data.projeto)} (${Number(data.itens?.length) || 0} itens)</p>
+              <p class="text-slate-400">${esc(dataCriacao)}${data.fator ? " · fator " + esc(Number(data.fator).toFixed(2)) : ""}</p>
+            </div>
+            <span class="font-bold text-amber-900">${formatarMoeda(Number(data.valorFinal) || 0)}</span>
+          `;
+          listaOrcamentosEl.appendChild(li);
+        });
+      } catch (error) {
+        console.error("Erro ao conectar:", error);
+        statusFirebaseEl.textContent = "🔴 Erro de Permissão/Conexão";
+        statusFirebaseEl.classList.replace("bg-amber-800", "bg-red-700");
+        listaOrcamentosEl.innerHTML = `<li class="text-red-600">Não foi possível carregar o histórico. Verifique as regras do Firestore.</li>`;
+      }
+    }
+
+    document.getElementById("btn-atualizar").addEventListener("click", carregarOrcamentos);
+    carregarOrcamentos();
+  </script>
+</body>
+</html>

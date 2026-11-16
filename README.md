@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://SEU-PROJETO.web.app/"><img src="https://img.shields.io/badge/DEMO-ONLINE-EC4899?style=for-the-badge&labelColor=0D1117" alt="Demo online" /></a>
+  <a href="https://sistema-marcenaria-rwn.web.app/"><img src="https://img.shields.io/badge/DEMO-ONLINE-EC4899?style=for-the-badge&labelColor=0D1117" alt="Demo online" /></a>
   <img src="https://img.shields.io/badge/STATUS-DEMONSTRATIVO-F9A8D4?style=for-the-badge&labelColor=0D1117" alt="Status demonstrativo" />
 </p>
 
@@ -55,7 +55,7 @@ A imagem abaixo mostra a aplicação publicada com o catálogo de insumos e ferr
 
 ### Demo online
 
-Acesse [SEU-PROJETO.web.app](https://SEU-PROJETO.web.app/).
+Acesse [sistema-marcenaria-rwn.web.app](https://sistema-marcenaria-rwn.web.app/).
 
 ### Execução local
 
@@ -81,23 +81,31 @@ Os preços do catálogo são valores de referência do mercado e servem para dem
 
 ## 07 // CONFIGURAÇÃO E SEGURANÇA
 
-O projeto utiliza Firebase no lado do cliente. Antes de usar dados reais, revise as regras do Firestore, restrinja permissões de leitura e escrita e evite publicar credenciais administrativas, tokens ou dados de clientes em commits, screenshots e exemplos.
+O projeto utiliza Firebase no lado do cliente. A configuração do app é pública por natureza, então a proteção dos dados depende das regras do Firestore, versionadas em `firestore.rules`: leitura pública, criação com validação de campos e tamanhos, e edição/exclusão bloqueadas. Os textos vindos do banco são escapados antes de serem exibidos.
+
+Para publicar as regras e a aplicação:
+
+```bash
+firebase deploy
+```
+
+Como a leitura é pública, não use dados reais de clientes na demonstração. Nunca publique credenciais administrativas ou tokens em commits e screenshots.
 
 ## 08 // ESTRUTURA
 
 ```text
 sistema-marcenaria/
-├── index.html    # Interface e estrutura da aplicação
-├── js/           # Módulos JavaScript
-├── firebase.json # Configuração do Firebase Hosting
-└── README.md     # Documentação do projeto
+├── index.html       # Interface, estilos e lógica da aplicação
+├── firebase.json    # Configuração do Firebase Hosting e Firestore
+├── firestore.rules  # Regras de segurança do banco
+└── README.md        # Documentação do projeto
 ```
 
 ## 09 // ROADMAP
 
 | Prioridade | Evolução sugerida |
 | --- | --- |
-| Alta | Implementar autenticação e regras do Firestore por usuário. |
+| Alta | Implementar autenticação e regras do Firestore por usuário, restringindo a leitura. |
 | Alta | Permitir edição e exclusão de orçamentos salvos. |
 | Média | Exportar o orçamento em PDF para envio ao cliente. |
 | Média | Permitir cadastro e atualização de preços pelo próprio usuário. |
@@ -107,7 +115,7 @@ sistema-marcenaria/
 
 Desenvolvido por **Natalia Almeida — By Natalia Dev**.
 
-- [Demo online](https://SEU-PROJETO.web.app/)
+- [Demo online](https://sistema-marcenaria-rwn.web.app/)
 - [Código-fonte](https://github.com/taliaalmeida/sistema-marcenaria)
 - [Perfil no GitHub](https://github.com/taliaalmeida/taliaalmeida)
 - [Instagram](https://www.instagram.com/nataliaalmeidatech)
