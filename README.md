@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://sistema-marcenaria-rwn.web.app/"><img src="https://img.shields.io/badge/DEMO-ONLINE-EC4899?style=for-the-badge&labelColor=0D1117" alt="Demo online" /></a>
+  <a href="https://taliaalmeida.github.io/sistema-marcenaria/"><img src="https://img.shields.io/badge/DEMO-ONLINE-EC4899?style=for-the-badge&labelColor=0D1117" alt="Demo online" /></a>
   <img src="https://img.shields.io/badge/STATUS-DEMONSTRATIVO-F9A8D4?style=for-the-badge&labelColor=0D1117" alt="Status demonstrativo" />
 </p>
 
@@ -49,13 +49,13 @@ A imagem abaixo mostra a aplicação publicada com o catálogo de insumos e ferr
 | Comportamento | JavaScript com ES Modules. |
 | Dados | Firebase Cloud Firestore para o histórico de orçamentos. |
 | Cálculo | Soma dos materiais multiplicada pelo fator de mão de obra e margem. |
-| Publicação | Firebase Hosting. |
+| Publicação | GitHub Pages. |
 
 ## 05 // COMO USAR
 
 ### Demo online
 
-Acesse [sistema-marcenaria-rwn.web.app](https://sistema-marcenaria-rwn.web.app/).
+Acesse [taliaalmeida.github.io/sistema-marcenaria](https://taliaalmeida.github.io/sistema-marcenaria/).
 
 ### Execução local
 
@@ -83,10 +83,10 @@ Os preços do catálogo são valores de referência do mercado e servem para dem
 
 O projeto utiliza Firebase no lado do cliente. A configuração do app é pública por natureza, então a proteção dos dados depende das regras do Firestore, versionadas em `firestore.rules`: leitura pública, criação com validação de campos e tamanhos, e edição/exclusão bloqueadas. Os textos vindos do banco são escapados antes de serem exibidos.
 
-Para publicar as regras e a aplicação:
+Para publicar as regras (a aplicação é publicada pelo GitHub Pages):
 
 ```bash
-firebase deploy
+firebase deploy --only firestore:rules
 ```
 
 Como a leitura é pública, não use dados reais de clientes na demonstração. Nunca publique credenciais administrativas ou tokens em commits e screenshots.
@@ -96,7 +96,7 @@ Como a leitura é pública, não use dados reais de clientes na demonstração. 
 ```text
 sistema-marcenaria/
 ├── index.html       # Interface, estilos e lógica da aplicação
-├── firebase.json    # Configuração do Firebase Hosting e Firestore
+├── firebase.json    # Configuração do Firebase (regras do Firestore)
 ├── firestore.rules  # Regras de segurança do banco
 └── README.md        # Documentação do projeto
 ```
@@ -115,7 +115,7 @@ sistema-marcenaria/
 
 Desenvolvido por **Natalia Almeida — By Natalia Dev**.
 
-- [Demo online](https://sistema-marcenaria-rwn.web.app/)
+- [Demo online](https://taliaalmeida.github.io/sistema-marcenaria/)
 - [Código-fonte](https://github.com/taliaalmeida/sistema-marcenaria)
 - [Perfil no GitHub](https://github.com/taliaalmeida/taliaalmeida)
 - [Instagram](https://www.instagram.com/nataliaalmeidatech)
