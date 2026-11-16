@@ -70,10 +70,17 @@ Acesse [taliaalmeida.github.io/sistema-marcenaria](https://taliaalmeida.github.i
 ```bash
 git clone https://github.com/taliaalmeida/sistema-marcenaria.git
 cd sistema-marcenaria
+```
+
+Abra o arquivo `index.html` no navegador. O projeto é um único arquivo e precisa de conexão com a internet para carregar o Tailwind CSS e o Firebase.
+
+Se o navegador bloquear algum recurso ao abrir o arquivo diretamente, use um servidor local:
+
+```bash
 python3 -m http.server 8000
 ```
 
-Abra [http://localhost:8000](http://localhost:8000) no navegador. Como o projeto usa ES Modules, executar por HTTP local é preferível a abrir o arquivo diretamente.
+Depois, abra [http://localhost:8000](http://localhost:8000). Alternativas: `npx serve .` ou a extensão Live Server do VS Code.
 
 ### Fluxo recomendado
 
