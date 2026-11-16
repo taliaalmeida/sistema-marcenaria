@@ -33,13 +33,21 @@
 
 ## 03 // INTERFACE
 
-A imagem abaixo mostra a aplicação publicada com o catálogo de insumos e ferragens, o cálculo do orçamento e o histórico de orçamentos salvos.
+As capturas abaixo mostram a aplicação publicada: a tela inicial, com o catálogo de insumos e ferragens, e um orçamento preenchido com o cálculo de materiais, margem e valor final.
+
+### Tela inicial
 
 <p align="center">
-  <img src="sistema-marcenaria-interface.webp" />
+  <img src="./tela-inicial.webp" alt="Tela inicial do sistema de orçamentos para marcenaria" />
 </p>
 
-<p align="center"><sub>Captura real da aplicação publicada, utilizando dados de demonstração.</sub></p>
+### Orçamento preenchido
+
+<p align="center">
+  <img src="./orcamento-preenchido.webp" alt="Exemplo de orçamento preenchido com cálculo de materiais, margem e valor final" />
+</p>
+
+<p align="center"><sub>Capturas reais da aplicação publicada, utilizando dados de demonstração.</sub></p>
 
 ## 04 // STACK E ARQUITETURA
 
