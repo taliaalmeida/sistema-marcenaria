@@ -110,10 +110,13 @@ Como a leitura é pública, não use dados reais de clientes na demonstração. 
 
 ```text
 sistema-marcenaria/
-├── index.html       # Interface, estilos e lógica da aplicação
-├── firebase.json    # Configuração do Firebase (regras do Firestore)
-├── firestore.rules  # Regras de segurança do banco
-└── README.md        # Documentação do projeto
+├── index.html                  # Interface, estilos e lógica da aplicação
+├── firebase.json               # Configuração do Firebase (regras do Firestore)
+├── firestore.rules             # Regras de segurança do banco
+├── .firebaserc                 # Projeto Firebase associado
+├── tela-inicial.webp           # Captura da tela inicial
+├── orcamento-preenchido.webp   # Captura de um orçamento preenchido
+└── README.md                   # Documentação do projeto
 ```
 
 ## 09 // ROADMAP
